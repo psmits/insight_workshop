@@ -1,0 +1,1 @@
+Various workshops I ran during my time at Insight data science. This are quick and dirty 30-60 minute presentations on a topic; they are not comprehensive and serve mostly to quickly familiarize the user so they can learn on their own so they can learn on their own.
