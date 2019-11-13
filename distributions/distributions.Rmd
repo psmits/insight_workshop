@@ -1,0 +1,128 @@
+---
+title: 'A bestiary of probability distributions'
+author: Peter Smits
+output: beamer_presentation
+---
+```{r constants, echo=FALSE}
+library(pacman)
+p_load(tidyverse, ggplot2)
+```
+
+
+## A great and terrible bestiary
+
+\begin{center}
+![](dist_relation.png)
+\end{center}
+
+
+## The exponential family
+
+
+
+## Uniform distribution
+
+
+
+# Discrete probability distributions
+
+## Bernoulli distribution
+
+**probability of "success" from single trial**
+
+Suppose we toss a coin only once. Let \(X \in {0, 1}\) be a binary random variable, with probability of "success" or heads being \(\theta\). 
+
+We say that \(X\) has a **Bernoulli** distribution, written \(X \sim \text{Bern}(\theta)\). The pmf is defined:
+\[
+\text{Bern}(x | \theta) = 
+\begin{cases}
+\theta & \text{if } x = 1 \\
+1 - \theta & \text{if } x = 0
+\end{cases}
+\]
+
+
+
+## Binomial distribution part 1
+
+**probability of \(X\) "successes" in \(n\) trials**
+
+Suppose we toss a coin \(n\) times. Let \(X \in {0, \dots, n}\) be the number of heads, with the probability of heads being \(\theta\).
+
+We say \(X\) has a **binomial** distribution, written \(X \sim \text{Bin}(n, \theta)\). The pmf is defined:
+\[
+\text{Bin}(X | n, \theta) = \binom{n}{X} \theta^{X} (1 - \theta)^{n - X}
+\]
+
+**Note:** Bernoulli distribution is special case of Binomial where \(n = 1\)
+
+
+
+## Binomial distribution part 2
+
+![](binom_wiki.png)
+
+
+
+## Geometric distribution part 1
+
+**number of "failures" before a "success"**
+
+If each pokeball we throw has probability \(1 / 10\) to catch Mew, the number of failed pokeballs will be distributed \(\text{Geom}(1 / 10)\).
+
+Two definitions:
+
+- The probability distribution of the number \(X\) of Bernoulli trials needed to get one success
+\[
+\text{Pr}(X = k) = (1 - \theta)^{k - 1} p
+\]
+
+- The probability distribution of the number \(Y = X - 1\) of failures before the first success
+\[
+\text{Pr}(Y = k) = (1 - \theta)^{k} p
+\]
+
+
+## Geometric distribution part 2
+
+![](geometric_wiki.png)
+
+
+## Negative Binomial distribution
+
+**number of draws until \(n\) successes**
+
+ is the number of "failures" that we will have before we achieve our rth success. Our successes have probability p.
+
+Thundershock has 60% accuracy and can faint a wild Raticate in 3 hits. The number of misses before Picachu faints Raticate with Thundershock is distributed \(X \sim \text{NBin}(r = 3, p = 0.6)\).
+
+
+
+
+## Hypergeometric distribution
+
+**number of "successes" in a fixed number of trails without replacement**
+
+Drawing a particular type of card from a deck of cards without replacement.
+
+
+
+## Poisson distribution
+
+**counts of rare events in unit of space or time**
+
+
+
+# Continuous probability distributions
+
+## Normal distribution
+
+## Exponential distribution
+
+## Gamma distribution
+
+## Beta distribution
+
+## Chi-Square distriution
+
+
