@@ -288,3 +288,55 @@ Appears in Bayesian models as prior.
 ![](gamma_wiki.png){ height=70% }
 
 \(\alpha = k\) and \(\beta = 1 / \theta\).
+
+
+
+## Beta distribution
+
+
+## \(\chi^{2}\) (Chi-square) distribution
+
+
+
+
+# Multivariate distributions
+
+## Multivariate uniform
+
+Exactly what it says on the tin.
+
+
+
+## Multinomial distribution
+
+Multivariate generalization of Binomial distribution. 
+
+When categories is 2, becomes Binomial distribution.
+
+When categories greater than 2 but the number of trials = 1, called **categorical distribution**.
+
+Used when modeling unordered categorical response.
+
+
+
+## Multivariate normal distribution
+
+There is also a multivariate \(t\)
+
+Super important.
+
+
+
+## Dirichlet distribution
+
+Multivariate generalization of Beta distribution.
+
+
+
+## Matrix-valued
+
+Wishart
+
+inverse-Wishart
+
+LKJ
