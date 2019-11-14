@@ -1,0 +1,62 @@
+---
+title: "Generalized linear model"
+author: Peter Smits
+output: beamer_presentation
+---
+```{r constants, echo=FALSE, message=FALSE}
+# set up the R environment
+
+if(!('pacman' %in% rownames(installed.packages()))) {
+  install.packages('pacman')
+}
+library(pacman)
+
+p_load(readr, janitor, here)
+p_load(tidyverse, broom, purrr, ggplot2)
+
+if(!file.exists('.here')) {
+  set_here(path = getwd())
+}
+```
+
+
+# Review of Linear Regression
+
+
+
+## Definition of linear regression
+
+> ... a method that summarizes how the average values of a numerical *outcome* variable vary over subpopulations defined by linear functions of *predictors*. [...] Regression can be used to predict an outcome given a lienar function of these predictors, and regression coefficients can be thought of as comparisons across predicted values or as comparisons among averages in the data.
+
+\begin{small}
+  Gelman and Hill, 2007, p.31
+\end{small}
+
+
+
+## Compacy written form
+
+\begin{align*}
+y &\sim \mathcal{N}(\mu, \sigma) \\
+\mu &= X \beta
+\end{align*}
+
+\(y \in \mathbb{R}\), \(\mu \in \mathbb{R}\), \(\sigma \in \mathbb{R}^{+}\), \(\beta_{k} \in \mathbb{R} \text{for } k = 1, ..., K\).
+
+\(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of covariates (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
+
+
+
+## Interpreting regression parameters
+  
+Coeffcient \(\beta\) is the expected difference in \(y\) between two observations that differ by 1 in a single predictor.
+
+
+
+## Fitting and inspecting a regression model
+
+```{r ex_linear}
+
+
+```
+
