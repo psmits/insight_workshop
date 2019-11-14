@@ -126,11 +126,11 @@ Assuming \(p = 0.5\)...
 
 **number of "successes" in a fixed number of trails without replacement** 
 
-There are only \(b\) Weedles (failure) and \(w\) Pikachus (success) in Viridian Forest. We encounter \(n\) Pokemone in the forest, and \(y\) is the number of Pikachus in our encounter. Population size is \(N = b + w\).
+There are only \(b\) Weedles (failure) and \(w\) Pikachus (success) in Viridian Forest. We encounter \(N\) Pokemon in the forest, and \(y\) is the number of Pikachus in our encounter. 
 
-If \(w \in \mathbb{N}\), \(b \in \mathbb{N}\), and \(N \in {0, ..., a + b}\), then for \(n \in {\text{max}(0, N - b), ..., min(w, N)}\),
+If \(w \in \mathbb{N}\), \(b \in \mathbb{N}\), and \(N \in {0, ..., a + b}\), then for \(y \in {\text{max}(0, N - b), ..., min(w, N)}\),
 \[
-\text{Hypergeometric}(y | N, w, n) = \frac{\binom{w}{y} \binom{N - w}{n - y}}{\binom{N}{n}}
+\text{Hypergeometric}(y | N, w, b) = \frac{\binom{w}{y} \binom{b}{N - y}}{\binom{w + b}{N}}
 \]
 
 
