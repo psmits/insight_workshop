@@ -5,6 +5,11 @@ output: beamer_presentation
 ---
 ```{r constants, echo=FALSE, message=FALSE}
 # set up the R environment
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
 
 if(!('pacman' %in% rownames(installed.packages()))) {
   install.packages('pacman')
@@ -13,6 +18,7 @@ library(pacman)
 
 p_load(readr, janitor, here)
 p_load(tidyverse, broom, purrr, ggplot2)
+p_load(foreign, arm)
 
 if(!file.exists('.here')) {
   set_here(path = getwd())
@@ -20,43 +26,157 @@ if(!file.exists('.here')) {
 ```
 
 
-# Review of Linear Regression
+## Regression
 
-
-
-## Definition of linear regression
-
-> ... a method that summarizes how the average values of a numerical *outcome* variable vary over subpopulations defined by linear functions of *predictors*. [...] Regression can be used to predict an outcome given a lienar function of these predictors, and regression coefficients can be thought of as comparisons across predicted values or as comparisons among averages in the data.
+> ... a method that summarizes how the average values of a numerical *outcome* variable vary over subpopulations defined by linear functions of *predictors*. [...] Regression can be used to predict an outcome given a linear function of these predictors, and regression coefficients can be thought of as comparisons across predicted values or as comparisons among averages in the data.
 
 \begin{small}
   Gelman and Hill, 2007, p.31
 \end{small}
 
 
+# Linear regression
 
-## Compacy written form
+## Compact written form
+
+\(N\) is number of observations. \(K\) is number of predictors plus one. \(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of predictors (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
+
+\(y \in \mathbb{R}\), \(\mu \in \mathbb{R}\), \(\sigma \in \mathbb{R}^{+}\), \(\beta_{k} \in \mathbb{R} \text{ for } k = 1, ..., K\).
 
 \begin{align*}
-y &\sim \mathcal{N}(\mu, \sigma) \\
-\mu &= X \beta
+y_{i} &\sim \mathcal{N}(\mu_{i}, \sigma) \\
+\mu_{i} &= X_{i} \beta
 \end{align*}
 
-\(y \in \mathbb{R}\), \(\mu \in \mathbb{R}\), \(\sigma \in \mathbb{R}^{+}\), \(\beta_{k} \in \mathbb{R} \text{for } k = 1, ..., K\).
-
-\(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of covariates (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
+for \(i = 1, ..., N\).
 
 
 
 ## Interpreting regression parameters
+
+- The intercept can only be interpreted assuming zero values for the other predictors. 
+
+- If predictors are mean centered, the intercept is the average value of the response when all predictors are at their mean.
   
-Coeffcient \(\beta\) is the expected difference in \(y\) between two observations that differ by 1 in a single predictor.
+- Coeffcient \(\beta\) is the expected difference in \(y\) between two observations that differ by 1 in a single predictor.
+
+- \(\sigma\) is standard deviation of dispersion around \(\mu\) (i.e. \(X \beta\)).
 
 
 
-## Fitting and inspecting a regression model
+## Fitting a regression model
 
-```{r ex_linear}
+```{r fit_linear, size='tiny'}
+kid_iq <- read.dta(here::here('ARM_Data', 'child.iq', 'kidiq.dta')) %>% 
+  as_tibble() %>%
+  clean_names()
 
+# feature processing 
+kid_iq <- 
+  kid_iq %>%
+  dplyr::select(-c(mom_age, mom_work)) %>%
+  mutate_at(vars(-kid_score), ~ arm::rescale(., binary.inputs = '-0.5,0.5')) %>%
+  mutate(mom_hsXmom_iq = mom_hs * mom_iq)
 
+model_kidiq <- lm(kid_score ~ ., data = kid_iq)
+
+tidy(model_kidiq) %>%
+  knitr::kable(digits = 2)
 ```
 
+
+
+## Inspecting a regression model
+
+```{r inspect_linear, echo=FALSE, size='tiny', fig.width=3, fig.height=2.5}
+fitted_kidiq <- fortify(model_kidiq)
+
+ggplot(kid_iq, aes(x = mom_iq, y = kid_score)) +
+  geom_point(size = 1) +
+  geom_line(data = fitted_kidiq, 
+            aes(x = mom_iq, y = .fitted),
+            size = 1.5,
+            colour = 'blue') +
+  facet_grid(mom_hs ~ .)
+```
+
+
+
+## Linear regression key assumptions
+
+In order from most to least important...
+
+1. Validity
+2. Additivity and linearity
+3. Independence of errors
+4. Equal variance of errors
+5. Normality of errors
+
+
+
+# Logistic regression
+
+
+## Compact written form
+
+\(N\) is number of observations. \(K\) is number of predictors plus one. \(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of predictors (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
+
+\(y \in {0, 1}\), \(\theta \in [0, 1]\), \(\beta_{k} \in \mathbb{R} \text{ for } k = 1, ..., K\).
+
+\begin{align*}
+y_{i} &\sim \text{Bernoulli}(\theta_{i}) \\
+\theta_{i}&= \text{logit}^{-1}(X_{i} \beta)
+\end{align*}
+
+for \(i = 1, ..., N\).
+
+
+
+## Interpreting logistic regression parameters
+
+- A regression coefficient describes the expected change in the response per unit difference in its predictor. 
+
+
+- However, the logit function introduced into our model creates a nonlinearity makes clear interpretation challenging.
+
+
+
+## The intercept of logistic regression
+
+- As always, the intercept can only be interpreted assuming zero values for the other predictors. 
+
+- If predictors are mean centered, the intercept is the average value of logit(response) when all predictors are at their mean.
+  
+- If zero is not interesting, or not even in the model, must be evaluated at some other point.
+
+
+
+## Logistic regression coefficients near the mean of the data
+
+- A difference of 1 in a predictor corresponds to expected change of \(\beta\) in the logit probability of the response.
+
+- Can evaluate change in response at or near the mean value of predictor \(x\). 
+  - Difference in \(\text{Pr}(y = 1)\) corresponding to adding 1 to \(x\) is \(\text{logit}^{-1}(\beta \bar{x}) - \text{logit}^{-1}(\beta (\bar{x} + 1))\).
+
+- Or use derivative of logistic curve at central value.
+  - Differentiating \(\text{logit}^{-1}(\alpha + \beta x)\) wrt \(x\) gives \(\beta \exp(\alpha + \beta x) / (1 + \exp(\alpha + \beta x))^{2}\).
+  - Calculate \(\alpha + \beta x\) for central value.
+  - Plug into derivative to give "change" in Pr\((y = 1)\) per small unit of "change" in \(x\).
+
+
+
+## The "divide by 4 rule"
+
+## Coefficients as odds ratios
+
+
+
+
+
+# Poisson regression
+
+# Ordered categorical response
+
+# Unordered categorical response
+
+# Robust regression
