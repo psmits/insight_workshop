@@ -179,7 +179,13 @@ df %>%
 
 ## Coefficients as odds ratios
 
-*Odds*: If two outcomes have the probabilities \((p, 1 - p)\), then the odds of \(p\) is \(p / (1 - p)\).
+- *Odds*: If two outcomes have the probabilities \((p, 1 - p)\), then the odds of \(p\) is \(p / (1 - p)\). Odds 1 is equivalent to probability 0.5.
+
+- *Odds ratio*: Ratio of two odds \((p_{1} / (1 - p_{1})) / (p_{2} / (1 - p_{2}))\)
+
+- Exponentiated logistic regression coefficients (i.e. \(\exp(\beta)\)) can be interepreted as odds ratios
+
+- Odds are difficult to understand, odds ratios even harder.
 
 
 
