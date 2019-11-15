@@ -7,8 +7,8 @@ output: beamer_presentation
 # set up the R environment
 def.chunk.hook  <- knitr::knit_hooks$get("chunk")
 knitr::knit_hooks$set(chunk = function(x, options) {
-  x <- def.chunk.hook(x, options)
-  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+                        x <- def.chunk.hook(x, options)
+                        ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
 })
 
 if(!('pacman' %in% rownames(installed.packages()))) {
@@ -31,18 +31,17 @@ if(!file.exists('.here')) {
 > ... a method that summarizes how the average values of a numerical *outcome* variable vary over subpopulations defined by linear functions of *predictors*. [...] Regression can be used to predict an outcome given a linear function of these predictors, and regression coefficients can be thought of as comparisons across predicted values or as comparisons among averages in the data.
 
 \begin{small}
-  Gelman and Hill, 2007, p.31
+Gelman and Hill, 2007, p.31
 \end{small}
 
 
 # Linear regression
 
-## Compact written form
+## Written out
 
 \(N\) is number of observations. \(K\) is number of predictors plus one. \(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of predictors (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
 
 \(y \in \mathbb{R}\), \(\mu \in \mathbb{R}\), \(\sigma \in \mathbb{R}^{+}\), \(\beta_{k} \in \mathbb{R} \text{ for } k = 1, ..., K\).
-
 \begin{align*}
 y_{i} &\sim \mathcal{N}(\mu_{i}, \sigma) \\
 \mu_{i} &= X_{i} \beta
@@ -57,7 +56,7 @@ for \(i = 1, ..., N\).
 - The intercept can only be interpreted assuming zero values for the other predictors. 
 
 - If predictors are mean centered, the intercept is the average value of the response when all predictors are at their mean.
-  
+
 - Coeffcient \(\beta\) is the expected difference in \(y\) between two observations that differ by 1 in a single predictor.
 
 - \(\sigma\) is standard deviation of dispersion around \(\mu\) (i.e. \(X \beta\)).
@@ -88,7 +87,7 @@ tidy(model_kidiq) %>%
 
 ## Inspecting a regression model
 
-```{r inspect_linear, echo=FALSE, size='tiny', fig.width=3, fig.height=2.5}
+```{r inspect_linear, echo=FALSE, size='tiny', fig.width=5, fig.height=3}
 fitted_kidiq <- fortify(model_kidiq)
 
 ggplot(kid_iq, aes(x = mom_iq, y = kid_score)) +
@@ -97,12 +96,12 @@ ggplot(kid_iq, aes(x = mom_iq, y = kid_score)) +
             aes(x = mom_iq, y = .fitted),
             size = 1.5,
             colour = 'blue') +
-  facet_grid(mom_hs ~ .)
+facet_grid(. ~ mom_hs)
 ```
 
 
 
-## Linear regression key assumptions
+## Key assumptions
 
 In order from most to least important...
 
@@ -117,18 +116,31 @@ In order from most to least important...
 # Logistic regression
 
 
-## Compact written form
+## Written out
 
 \(N\) is number of observations. \(K\) is number of predictors plus one. \(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of predictors (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
 
-\(y \in {0, 1}\), \(\theta \in [0, 1]\), \(\beta_{k} \in \mathbb{R} \text{ for } k = 1, ..., K\).
-
+\(y \in {0, 1}\), \(\theta \in [0, 1]\), \(\beta_{k} \in \mathbb{R} \text{ for } k = 1, ..., K\), and \(\text{logit}(p) = \log(p / 1 - p)\) and \(\text{logit}^{-1}(x) = \exp(x) / (1 + \exp(x))\).
 \begin{align*}
 y_{i} &\sim \text{Bernoulli}(\theta_{i}) \\
 \theta_{i}&= \text{logit}^{-1}(X_{i} \beta)
 \end{align*}
 
 for \(i = 1, ..., N\).
+
+
+
+## Logistic function \(\text{logit}(p) = \frac{p}{1 - p}\)
+
+```{r logitistic, echo=FALSE, fig.width=3, fig.height=3}
+df <- tibble(x = seq(from = -10, to = 10, by = .1)) %>%
+  mutate(y = arm::invlogit(x))         # inverse logit
+
+df %>%
+  ggplot() +
+  geom_line(aes(x = x, y = y)) +
+  labs(x = 'log-odds scale', y = 'probability scale')
+```
 
 
 
@@ -146,7 +158,7 @@ for \(i = 1, ..., N\).
 - As always, the intercept can only be interpreted assuming zero values for the other predictors. 
 
 - If predictors are mean centered, the intercept is the average value of logit(response) when all predictors are at their mean.
-  
+
 - If zero is not interesting, or not even in the model, must be evaluated at some other point.
 
 
@@ -165,11 +177,19 @@ for \(i = 1, ..., N\).
 
 
 
-## The "divide by 4 rule"
-
 ## Coefficients as odds ratios
 
+*Odds*: If two outcomes have the probabilities \((p, 1 - p)\), then the odds of \(p\) is \(p / (1 - p)\).
 
+
+
+## The "divide by 4 rule"
+
+The logistic curve is steepest at its center when \(X \beta = 0\) so that \(\text{logit}^{-1}(X \beta) = 0.5\).
+
+The slope of the curve -- the derivative of the logistic function -- is maximized at this point and equals \(\beta \exp(0) / (1 + \exp(0))^{2} = \beta / 4\).
+
+Thus, \(\beta / 4\) is the *maximum difference* in \(\text{Pr}(y = 1)\) corresponding to a unit difference in \(x\).
 
 
 
