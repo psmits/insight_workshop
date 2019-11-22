@@ -17,7 +17,7 @@ if(!('pacman' %in% rownames(installed.packages()))) {
 library(pacman)
 
 p_load(readr, janitor, here)
-p_load(tidyverse, broom, purrr, ggplot2)
+p_load(tidyverse, modelr, broom, purrr, ggplot2)
 p_load(foreign, arm)
 
 if(!file.exists('.here')) {
@@ -48,18 +48,6 @@ y_{i} &\sim \mathcal{N}(\mu_{i}, \sigma) \\
 \end{align*}
 
 for \(i = 1, ..., N\).
-
-
-
-## Interpreting regression parameters
-
-- The intercept can only be interpreted assuming zero values for the other predictors. 
-
-- If predictors are mean centered, the intercept is the average value of the response when all predictors are at their mean.
-
-- Coeffcient \(\beta\) is the expected difference in \(y\) between two observations that differ by 1 in a single predictor.
-
-- \(\sigma\) is standard deviation of dispersion around \(\mu\) (i.e. \(X \beta\)).
 
 
 
@@ -98,6 +86,18 @@ ggplot(kid_iq, aes(x = mom_iq, y = kid_score)) +
             colour = 'blue') +
 facet_grid(. ~ mom_hs)
 ```
+
+
+
+## Interpreting regression parameters
+
+- The intercept can only be interpreted assuming zero values for the other predictors. 
+
+- If predictors are mean centered, the intercept is the average value of the response when all predictors are at their mean.
+
+- Coeffcient \(\beta\) is the expected difference in \(y\) between two observations that differ by 1 in a single predictor.
+
+- \(\sigma\) is standard deviation of dispersion around \(\mu\) (i.e. \(X \beta\)).
 
 
 
@@ -141,6 +141,35 @@ df %>%
   geom_line(aes(x = x, y = y)) +
   labs(x = 'log-odds scale', y = 'probability scale')
 ```
+
+
+
+## Fitting a logistic regression model
+
+```{r fit_logistic, size='tiny'}
+# issue with row numbers
+wells <- read.delim(here::here('ARM_Data', 'arsenic', 'wells.dat'),
+                    sep = ' ') %>%
+  as_tibble() %>%
+  clean_names()
+
+# feature processing
+wells <- 
+  wells %>%
+  dplyr::select(-c(assoc, educ)) %>%
+  mutate_at(vars(-switch), ~ arm::rescale(., binary.inputs = '-0.5,0.5')) %>%
+  mutate(distXarsenic = dist * arsenic)
+
+model_wells <- glm(switch ~ ., data = wells)
+
+tidy(model_wells) %>%
+  knitr::kable(digits = 2)
+```
+
+
+
+## Inspecting a logistic regression model
+
 
 
 
@@ -201,8 +230,47 @@ Thus, \(\beta / 4\) is the *maximum difference* in \(\text{Pr}(y = 1)\) correspo
 
 # Poisson regression
 
+
+## Written out
+
+\(N\) is number of observations. \(K\) is number of predictors plus one. \(y\) is a length \(N\) vector of observations. \(X\) is a \(N \times K\) matrix of predictors (and a column of 1s). \(\beta\) is a length \(K\) vector of regression coefficients (including intercept).
+
+\(y \in \mathbb{N}\), \(\lambda \in \mathbb{R}^{+}\), \(\beta_{k} \in \mathbb{R} \text{ for } k = 1, ..., K\).
+\begin{align*}
+y_{i} &\sim \text{Poisson}(\lambda_{i}) \\
+\lambda_{i} &= \exp(X_{i} \beta)
+\end{align*}
+
+for \(i = 1, ..., N\).
+
+
+
 # Ordered categorical response
 
+## Written out
+
+
+
+
+
 # Unordered categorical response
+
+## Written out
+
+Suppose there are \(K\) possible outcomes for each output variable \(y_{i}\). Also suppose that there is a \(D\)-dimensional vector \(x_{i}\) of predictors for y_{i}.
+
+If \(N\), \(N > 0\), and if \(\theta \in \mathbb{R}^{N}\) forms an \(N\)-simplex (i.e. has nonnegative entries summing to one), then for \(y \in {1, ..., N}\), 
+\begin{align*}
+y_{i} &\sim \text{Categorical}(\theta_{i}) \\
+\theta_{i} &= \text{softmax}(x_{i} \beta)
+\end{align*}
+
+for \(i = 1, ..., N\).
+
+FYI, softmax is
+\[
+\text{softmax}(y) \frac{\exp(y)}{\sum_{k = 1}^{K} \exp(y_{k})}
+\]
+
 
 # Robust regression
